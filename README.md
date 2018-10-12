@@ -1,6 +1,6 @@
-# Actions on Google: System intents sample
+# Actions on Google: Helper intents sample
 
-Actions on Google sample that demonstrates how to use the library to invoke system intents such as requesting
+Actions on Google sample that demonstrates how to use the library to invoke helper intents such as requesting
 the user for their name or location.
 
 ## Setup Instructions

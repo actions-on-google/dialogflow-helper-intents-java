@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 public class ActionsServlet extends HttpServlet {
 
-  private App actionsApp = new SystemIntentsApp();
+  private App actionsApp = new HelperIntentsApp();
 
   @Override
   protected void doPost(HttpServletRequest req, HttpServletResponse res)

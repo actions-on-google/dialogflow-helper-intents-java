@@ -28,12 +28,12 @@ import java.io.*;
 
 /**
  * Handles request received via AWS - API Gateway proxy integration and
- * delegates to SystemIntentsApp.
+ * delegates to HelperIntentsApp.
  * https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
  */
 public class ActionsAWSHandler implements RequestStreamHandler {
   // Replace this with your webhook.
-  private App actionsApp = new SystemIntentsApp();
+  private App actionsApp = new HelperIntentsApp();
   private JSONParser parser = new JSONParser();
 
   @Override

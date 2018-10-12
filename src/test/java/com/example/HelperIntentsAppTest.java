@@ -25,7 +25,7 @@ import java.nio.file.Paths;
 import java.util.concurrent.CompletableFuture;
 
 
-public class SystemIntentsAppTest {
+public class HelperIntentsAppTest {
 
   private static String fromFile(String fileName) throws IOException {
     Path absolutePath = Paths.get("src", "test", "resources",
@@ -35,7 +35,7 @@ public class SystemIntentsAppTest {
 
   @Test
   public void testWelcome() throws Exception {
-    SystemIntentsApp app = new SystemIntentsApp();
+    HelperIntentsApp app = new HelperIntentsApp();
     String requestBody = fromFile("request_welcome.json");
 
     CompletableFuture<String> future = app.handleRequest(requestBody,

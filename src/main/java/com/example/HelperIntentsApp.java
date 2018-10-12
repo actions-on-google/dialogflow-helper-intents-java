@@ -18,7 +18,7 @@ package com.example;
 
 import com.google.actions.api.*;
 import com.google.actions.api.response.ResponseBuilder;
-import com.google.actions.api.response.systemintent.*;
+import com.google.actions.api.response.helperintent.*;
 import com.google.api.services.actions_fulfillment.v2.model.DateTime;
 import com.google.api.services.actions_fulfillment.v2.model.Location;
 import com.google.api.services.actions_fulfillment.v2.model.SimpleResponse;
@@ -26,7 +26,7 @@ import com.google.api.services.actions_fulfillment.v2.model.UserProfile;
 
 import java.util.concurrent.CompletableFuture;
 
-public class SystemIntentsApp extends DialogflowApp {
+public class HelperIntentsApp extends DialogflowApp {
 
   private static final String[] SUGGESTIONS = new String[]{
           "confirmation",
