@@ -24,8 +24,6 @@ import com.google.api.services.actions_fulfillment.v2.model.Location;
 import com.google.api.services.actions_fulfillment.v2.model.SimpleResponse;
 import com.google.api.services.actions_fulfillment.v2.model.UserProfile;
 
-import java.util.concurrent.CompletableFuture;
-
 public class HelperIntentsApp extends DialogflowApp {
 
   private static final String[] SUGGESTIONS = new String[]{
@@ -37,8 +35,8 @@ public class HelperIntentsApp extends DialogflowApp {
   };
 
   @ForIntent("Default Welcome Intent")
-  public CompletableFuture<ActionResponse> welcome(ActionRequest request) {
-    ResponseBuilder responseBuilder = getResponseBuilder();
+  public ActionResponse welcome(ActionRequest request) {
+    ResponseBuilder responseBuilder = getResponseBuilder(request);
     responseBuilder
             .add(new SimpleResponse()
                     .setDisplayText("Hello there")
@@ -49,13 +47,12 @@ public class HelperIntentsApp extends DialogflowApp {
                     .setDisplayText("I can show you confirmation, " +
                             "permission, location request or sign in"))
             .addSuggestions(SUGGESTIONS);
-    return CompletableFuture.completedFuture(responseBuilder.build());
+    return responseBuilder.build();
   }
 
   @ForIntent("actions_intent_no_input")
-  public CompletableFuture<ActionResponse> handleNoInput(
-          ActionRequest request) {
-    ResponseBuilder responseBuilder = getResponseBuilder();
+  public ActionResponse handleNoInput(ActionRequest request) {
+    ResponseBuilder responseBuilder = getResponseBuilder(request);
     int repromptCount = request.getRepromptCount() == null ? 0 :
             request.getRepromptCount().intValue();
     if (repromptCount == 0) {
@@ -69,14 +66,12 @@ public class HelperIntentsApp extends DialogflowApp {
               .build();
     }
 
-    return CompletableFuture.completedFuture(
-            responseBuilder.build());
+    return responseBuilder.build();
   }
 
   @ForIntent("askForConfirmation")
-  public CompletableFuture<ActionResponse> askForConfirmation(
-          ActionRequest request) {
-    ResponseBuilder responseBuilder = getResponseBuilder();
+  public ActionResponse askForConfirmation(ActionRequest request) {
+    ResponseBuilder responseBuilder = getResponseBuilder(request);
 
     responseBuilder
             .add("Placeholder for confirmation")
@@ -84,44 +79,38 @@ public class HelperIntentsApp extends DialogflowApp {
             .add(new Confirmation()
                     .setConfirmationText("Are you sure you want to do this?"));
 
-    return CompletableFuture.completedFuture(
-            responseBuilder.build());
+    return responseBuilder.build();
   }
 
   @ForIntent("actions_intent_confirmation")
-  public CompletableFuture<ActionResponse> handleConfirmationResponse(
-          ActionRequest request) {
+  public ActionResponse handleConfirmationResponse(ActionRequest request) {
     boolean userConfirmation = request.getUserConfirmation() != null &&
             request.getUserConfirmation().booleanValue();
 
-    ResponseBuilder responseBuilder = getResponseBuilder();
+    ResponseBuilder responseBuilder = getResponseBuilder(request);
     responseBuilder
             .add(userConfirmation ?
                     "Thank you for confirming" :
                     "No problem. We won't bother you")
             .addSuggestions(SUGGESTIONS);
-    return CompletableFuture.completedFuture(
-            responseBuilder.build());
+    return responseBuilder.build();
   }
 
   @ForIntent("askForDateTime")
-  public CompletableFuture<ActionResponse> askForDateTime(
-          ActionRequest request) {
-    ResponseBuilder responseBuilder = getResponseBuilder();
+  public ActionResponse askForDateTime(ActionRequest request) {
+    ResponseBuilder responseBuilder = getResponseBuilder(request);
     responseBuilder
             .add("Placeholder for confirmation text")
             .add(new DateTimePrompt()
                     .setDateTimePrompt("When do you want to come in?")
                     .setDatePrompt("Which date works for you?")
                     .setTimePrompt("What time works for you?"));
-    return CompletableFuture.completedFuture(
-            responseBuilder.build());
+    return responseBuilder.build();
   }
 
   @ForIntent("actions_intent_datetime")
-  public CompletableFuture<ActionResponse> handleDateTimeResponse(
-          ActionRequest request) {
-    ResponseBuilder responseBuilder = getResponseBuilder();
+  public ActionResponse handleDateTimeResponse(ActionRequest request) {
+    ResponseBuilder responseBuilder = getResponseBuilder(request);
     String response;
     DateTime dateTimeValue = request.getDateTime();
 
@@ -134,15 +123,13 @@ public class HelperIntentsApp extends DialogflowApp {
     responseBuilder
             .add(response)
             .addSuggestions(SUGGESTIONS);
-    return CompletableFuture.completedFuture(
-            responseBuilder.build());
+    return responseBuilder.build();
   }
 
 
   @ForIntent("askForPermissions")
-  public CompletableFuture<ActionResponse> askForPermission(
-          ActionRequest request) {
-    ResponseBuilder responseBuilder = getResponseBuilder();
+  public ActionResponse askForPermission(ActionRequest request) {
+    ResponseBuilder responseBuilder = getResponseBuilder(request);
     responseBuilder
             .add("Placeholder for permissions text")
             .add(new Permission()
@@ -152,14 +139,12 @@ public class HelperIntentsApp extends DialogflowApp {
                     })
                     .setContext("To provide a better experience"));
 
-    return CompletableFuture.completedFuture(
-            responseBuilder.build());
+    return responseBuilder.build();
   }
 
   @ForIntent("actions_intent_permission")
-  public CompletableFuture<ActionResponse> handlePermissionResponse(
-          ActionRequest request) {
-    ResponseBuilder responseBuilder = getResponseBuilder();
+  public ActionResponse handlePermissionResponse(ActionRequest request) {
+    ResponseBuilder responseBuilder = getResponseBuilder(request);
     boolean havePermission = request.isPermissionGranted() != null &&
             request.isPermissionGranted().booleanValue();
     String response;
@@ -183,8 +168,7 @@ public class HelperIntentsApp extends DialogflowApp {
             .add(response)
             .addSuggestions(SUGGESTIONS);
 
-    return CompletableFuture.completedFuture(
-            responseBuilder.build());
+    return responseBuilder.build();
   }
 
   private String getLocationString(Location location) {
@@ -201,23 +185,20 @@ public class HelperIntentsApp extends DialogflowApp {
   }
 
   @ForIntent("askForPlace")
-  public CompletableFuture<ActionResponse> askForPlace(
-          ActionRequest request) {
-    ResponseBuilder responseBuilder = getResponseBuilder();
+  public ActionResponse askForPlace(ActionRequest request) {
+    ResponseBuilder responseBuilder = getResponseBuilder(request);
     responseBuilder
             .add("Placeholder for place text")
             .add(new Place()
                     .setRequestPrompt("Where do you want to have lunch?")
                     .setPermissionContext("To find lunch locations"));
 
-    return CompletableFuture.completedFuture(
-            responseBuilder.build());
+    return responseBuilder.build();
   }
 
   @ForIntent("actions_intent_place")
-  public CompletableFuture<ActionResponse> handlePlaceResponse(
-          ActionRequest request) {
-    ResponseBuilder responseBuilder = getResponseBuilder();
+  public ActionResponse handlePlaceResponse(ActionRequest request) {
+    ResponseBuilder responseBuilder = getResponseBuilder(request);
     Location location = request.getPlace();
 
     String response;
@@ -231,14 +212,12 @@ public class HelperIntentsApp extends DialogflowApp {
             .add(response)
             .addSuggestions(SUGGESTIONS);
 
-    return CompletableFuture.completedFuture(
-            responseBuilder.build());
+    return responseBuilder.build();
   }
 
   @ForIntent("askForSignIn")
-  public CompletableFuture<ActionResponse> askForSignIn(
-          ActionRequest request) {
-    ResponseBuilder responseBuilder = getResponseBuilder();
+  public ActionResponse askForSignIn(ActionRequest request) {
+    ResponseBuilder responseBuilder = getResponseBuilder(request);
 
     if (!request.hasCapability(Capability.SCREEN_OUTPUT.getValue())) {
       responseBuilder.add("Sign in is only available on devices " +
@@ -249,14 +228,12 @@ public class HelperIntentsApp extends DialogflowApp {
               .add(new SignIn());
     }
 
-    return CompletableFuture.completedFuture(
-            responseBuilder.build());
+    return responseBuilder.build();
   }
 
   @ForIntent("actions_intent_sign_in")
-  public CompletableFuture<ActionResponse> handleSignInResponse(
-          ActionRequest request) {
-    ResponseBuilder responseBuilder = getResponseBuilder();
+  public ActionResponse handleSignInResponse(ActionRequest request) {
+    ResponseBuilder responseBuilder = getResponseBuilder(request);
     boolean signedIn = request.isSignedIn() != null &&
             request.isSignedIn().booleanValue();
 
@@ -264,7 +241,6 @@ public class HelperIntentsApp extends DialogflowApp {
             .add(signedIn ? "Successfully signed in" : "Unable to sign in")
             .addSuggestions(SUGGESTIONS);
 
-    return CompletableFuture.completedFuture(
-            responseBuilder.build());
+    return responseBuilder.build();
   }
 }

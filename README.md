@@ -5,19 +5,6 @@ the user for their name or location.
 
 ## Setup Instructions
 
-### Webhook
-The boilerplate includes entry points for both Java servlets and AWS Lambda.
-* If using Servlets,
-    1. Delete ActionsAWSHandler.java
-    1. Remove dependencies in build.gradle for AWS.
-    1. Build your project's jar file using gradle.
-    1. Deploy your servlet following instructions on [Google Cloud Platform App Engine](https://cloud.google.com/appengine/)
-* If using AWS lambda,
-    1. Delete ActionsServlet
-    1. Remove corresponding dependencies for Servlets in build.gradle.
-    1. Build the AWS compatible zip file using the buildAWSZip gradle task.
-    1. Deploy the zip in AWS by following instructions at https://aws.amazon.com/lambda/
-
 ### Action configuration
 1. Use the [Actions on Google Console](https://console.actions.google.com) to add a new project with a name of your choosing and click *Create Project*.
 1. Click *Skip*, located on the top right.
@@ -26,8 +13,30 @@ The boilerplate includes entry points for both Java servlets and AWS Lambda.
 1. Click on the gear icon to see the project settings.
 1. Select *Export and Import*.
 1. Select *Restore from zip*. Follow the directions to restore from the `agent.zip` file in this repo.
-1. Deploy the fulfillment webhook as described in the previous section
-1. Go back to the Dialogflow console and select *Fulfillment* from the left navigation menu. Enable *Webhook*, set the value of *URL* to the webhook from the previous section, then click *Save*.
+1. Deploy the fulfillment webhook as described in the next section
+1. Go back to the Dialogflow console and select *Fulfillment* from the left navigation menu. Enable *Webhook*, set the value of *URL* to the webhook from the next section, then click *Save*.
+
+### Webhook
+
+When a new project is created using the Actions Console, it also creates a Google Cloud project in the background.
+Copy the name of this project from the Action Console project settings page.
+
+#### Build for Google Cloud Platform
+    1. Delete ActionsAWSHandler.java
+    1. Remove the following line from build.gradle:
+       1. `apply from: 'build-aws.gradle'`
+    1. Instructions for [Google Cloud App Engine Standard Environment](https://cloud.google.com/appengine/docs/standard/java/)
+    1. Use gcloud CLI to set the project to the name of your Actions project. Use 'gcloud init' to initialize and set your Google cloud project to the name of the Actions project.
+    1. Deploy to [App Engine using Gradle](https://cloud.google.com/appengine/docs/flexible/java/using-gradle) by running the following command: `gradle appengineDeploy`. You can do this directly from
+    IntelliJ by opening the Gradle tray and running the appEngineDeploy task. This will start the process to deploy the fulfillment code to Google Cloud App Engine.
+
+#### Build for AWS
+    1. Delete ActionsServlet
+    1. Remove the following line from build.gradle:
+       1. `apply from: 'build-gcp.gradle'`
+    1. Build the AWS Lambda compatible zip file using the buildAWSZip gradle task: `gradle buildAWSZip`
+    1. Deploy the zip file found at `build/distributions/myactions.zip` as an AWS Lambda function by following instructions at https://aws.amazon.com/lambda/
+
 
 ## Test on the Actions on Google simulator
 1. Select [*Integrations*](https://console.dialogflow.com/api-client/#/agent//integrations) from the left navigation menu and open the *Settings* menu for Actions on Google.

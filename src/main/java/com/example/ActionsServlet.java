@@ -17,7 +17,10 @@
 package com.example;
 
 import com.google.actions.api.App;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,24 +28,45 @@ import java.io.IOException;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+/**
+ * Handles request received via HTTP POST and delegates it to your Actions app. See: [Request
+ * handling in Google App
+ * Engine](https://cloud.google.com/appengine/docs/standard/java/how-requests-are-handled).
+ */
+@WebServlet(name = "actions", value = "/")
 public class ActionsServlet extends HttpServlet {
-
-  private App actionsApp = new HelperIntentsApp();
+  private static final Logger LOG = LoggerFactory.getLogger(HelperIntentsApp.class);
+  private final App actionsApp = new HelperIntentsApp();
 
   @Override
-  protected void doPost(HttpServletRequest req, HttpServletResponse res)
-          throws IOException {
+  protected void doPost(HttpServletRequest req, HttpServletResponse res) throws IOException {
     String body = req.getReader().lines().collect(Collectors.joining());
+    LOG.info("doPost, body = {}", body);
+    actionsApp
+            .handleRequest(body, null)
+            .thenAccept(
+                    (Consumer<String>)
+                            jsonResponse -> {
+                              LOG.info("Generated json = {}", jsonResponse);
+                              res.setContentType("application/json");
+                              writeResponse(res, jsonResponse);
+                            })
+            .exceptionally(
+                    (throwable -> {
+                      LOG.error("Error in App.handleRequest ", throwable);
+                      writeResponse(res, "Error handling the intent - " + throwable);
+                      return null;
+                    }));
+  }
 
-    actionsApp.handleRequest(body, null)
-            .thenAccept((Consumer<String>) jsonResponse -> {
-              System.out.println("Generated json = " + jsonResponse);
-              res.setContentType("application/json");
-              writeResponse(res, jsonResponse);
-            }).exceptionally((throwable -> {
-      writeResponse(res, "Error handling the intent - " + throwable);
-      return null;
-    }));
+  @Override
+  protected void doGet(HttpServletRequest request, HttpServletResponse response)
+          throws IOException {
+    response.setContentType("text/plain");
+    response
+            .getWriter()
+            .println(
+                    "ActionsServlet is listening but requires valid POST request to respond with Action response.");
   }
 
   private void writeResponse(HttpServletResponse res, String asJson) {
