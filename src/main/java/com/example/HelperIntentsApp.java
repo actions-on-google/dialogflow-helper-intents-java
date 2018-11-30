@@ -16,54 +16,60 @@
 
 package com.example;
 
-import com.google.actions.api.*;
+import com.google.actions.api.ActionRequest;
+import com.google.actions.api.ActionResponse;
+import com.google.actions.api.Capability;
+import com.google.actions.api.ConstantsKt;
+import com.google.actions.api.DialogflowApp;
+import com.google.actions.api.ForIntent;
 import com.google.actions.api.response.ResponseBuilder;
-import com.google.actions.api.response.helperintent.*;
+import com.google.actions.api.response.helperintent.Confirmation;
+import com.google.actions.api.response.helperintent.DateTimePrompt;
+import com.google.actions.api.response.helperintent.Permission;
+import com.google.actions.api.response.helperintent.Place;
+import com.google.actions.api.response.helperintent.SignIn;
 import com.google.api.services.actions_fulfillment.v2.model.DateTime;
 import com.google.api.services.actions_fulfillment.v2.model.Location;
 import com.google.api.services.actions_fulfillment.v2.model.SimpleResponse;
 import com.google.api.services.actions_fulfillment.v2.model.UserProfile;
+import java.text.MessageFormat;
+import java.util.ResourceBundle;
 
 public class HelperIntentsApp extends DialogflowApp {
 
-  private static final String[] SUGGESTIONS = new String[]{
-          "confirmation",
-          "date time",
-          "permissions",
-          "place",
-          "sign in"
-  };
+  private static final String[] SUGGESTIONS =
+      new String[]{"confirmation", "date time", "permissions", "place", "sign in"};
 
   @ForIntent("Default Welcome Intent")
   public ActionResponse welcome(ActionRequest request) {
     ResponseBuilder responseBuilder = getResponseBuilder(request);
+    ResourceBundle rb = ResourceBundle.getBundle("resources", request.getLocale());
+
     responseBuilder
-            .add(new SimpleResponse()
-                    .setDisplayText("Hello there")
-                    .setTextToSpeech("Hi there!"))
-            .add(new SimpleResponse()
-                    .setTextToSpeech("I can show you confirmation, " +
-                            "permission or location request on your phone.")
-                    .setDisplayText("I can show you confirmation, " +
-                            "permission, location request or sign in"))
-            .addSuggestions(SUGGESTIONS);
+        .add(
+            new SimpleResponse()
+                .setDisplayText(rb.getString("welcome_1"))
+                .setTextToSpeech(rb.getString("welcome_2")))
+        .add(
+            new SimpleResponse()
+                .setTextToSpeech(rb.getString("options_tts"))
+                .setDisplayText(rb.getString("options_speech")))
+        .addSuggestions(SUGGESTIONS);
     return responseBuilder.build();
   }
 
   @ForIntent("actions_intent_no_input")
   public ActionResponse handleNoInput(ActionRequest request) {
     ResponseBuilder responseBuilder = getResponseBuilder(request);
-    int repromptCount = request.getRepromptCount() == null ? 0 :
-            request.getRepromptCount().intValue();
+    ResourceBundle rb = ResourceBundle.getBundle("resources", request.getLocale());
+    int repromptCount =
+        request.getRepromptCount() == null ? 0 : request.getRepromptCount();
     if (repromptCount == 0) {
-      responseBuilder.add("What was that?").build();
+      responseBuilder.add(rb.getString("no_input_1")).build();
     } else if (repromptCount == 1) {
-      responseBuilder.add(
-              "Sorry I didn't catch that. Could you please repeat?").build();
+      responseBuilder.add(rb.getString("no_input_2")).build();
     } else if (request.isFinalPrompt()) {
-      responseBuilder.add("Okay let's try this again later.")
-              .endConversation()
-              .build();
+      responseBuilder.add(rb.getString("no_input_3")).endConversation().build();
     }
 
     return responseBuilder.build();
@@ -72,72 +78,80 @@ public class HelperIntentsApp extends DialogflowApp {
   @ForIntent("askForConfirmation")
   public ActionResponse askForConfirmation(ActionRequest request) {
     ResponseBuilder responseBuilder = getResponseBuilder(request);
+    ResourceBundle rb = ResourceBundle.getBundle("resources", request.getLocale());
 
     responseBuilder
-            .add("Placeholder for confirmation")
-            .addSuggestions(SUGGESTIONS)
-            .add(new Confirmation()
-                    .setConfirmationText("Are you sure you want to do this?"));
+        .add(rb.getString("conf_placeholder"))
+        .addSuggestions(SUGGESTIONS)
+        .add(new Confirmation().setConfirmationText(rb.getString("conf_text")));
 
     return responseBuilder.build();
   }
 
   @ForIntent("actions_intent_confirmation")
   public ActionResponse handleConfirmationResponse(ActionRequest request) {
-    boolean userConfirmation = request.getUserConfirmation() != null &&
-            request.getUserConfirmation().booleanValue();
+    boolean userConfirmation =
+        request.getUserConfirmation() != null && request.getUserConfirmation();
 
     ResponseBuilder responseBuilder = getResponseBuilder(request);
+    ResourceBundle rb = ResourceBundle.getBundle("resources", request.getLocale());
+
     responseBuilder
-            .add(userConfirmation ?
-                    "Thank you for confirming" :
-                    "No problem. We won't bother you")
-            .addSuggestions(SUGGESTIONS);
+        .add(
+            userConfirmation
+                ? rb.getString("conf_response_success")
+                : rb.getString("conf_response_failure"))
+        .addSuggestions(SUGGESTIONS);
     return responseBuilder.build();
   }
 
   @ForIntent("askForDateTime")
   public ActionResponse askForDateTime(ActionRequest request) {
     ResponseBuilder responseBuilder = getResponseBuilder(request);
+    ResourceBundle rb = ResourceBundle.getBundle("resources", request.getLocale());
+
     responseBuilder
-            .add("Placeholder for confirmation text")
-            .add(new DateTimePrompt()
-                    .setDateTimePrompt("When do you want to come in?")
-                    .setDatePrompt("Which date works for you?")
-                    .setTimePrompt("What time works for you?"));
+        .add(rb.getString("datetime_placeholder"))
+        .add(
+            new DateTimePrompt()
+                .setDateTimePrompt(rb.getString("datetime_prompt_1"))
+                .setDatePrompt(rb.getString("datetime_prompt_2"))
+                .setTimePrompt(rb.getString("datetime_prompt_3")));
     return responseBuilder.build();
   }
 
   @ForIntent("actions_intent_datetime")
   public ActionResponse handleDateTimeResponse(ActionRequest request) {
     ResponseBuilder responseBuilder = getResponseBuilder(request);
+    ResourceBundle rb = ResourceBundle.getBundle("resources", request.getLocale());
+
     String response;
     DateTime dateTimeValue = request.getDateTime();
 
     if (dateTimeValue != null) {
-      response = "Thank you for your response. We will see you on " +
-              dateTimeValue.getDate();
+      response =
+          MessageFormat.format(rb.getString("datetime_response_success"), dateTimeValue.getDate());
     } else {
-      response = "Sorry, I didn't get that.";
+      response = rb.getString("datetime_response_failure");
     }
-    responseBuilder
-            .add(response)
-            .addSuggestions(SUGGESTIONS);
+    responseBuilder.add(response).addSuggestions(SUGGESTIONS);
     return responseBuilder.build();
   }
-
 
   @ForIntent("askForPermissions")
   public ActionResponse askForPermission(ActionRequest request) {
     ResponseBuilder responseBuilder = getResponseBuilder(request);
+    ResourceBundle rb = ResourceBundle.getBundle("resources", request.getLocale());
+
     responseBuilder
-            .add("Placeholder for permissions text")
-            .add(new Permission()
-                    .setPermissions(new String[]{
-                            ConstantsKt.PERMISSION_NAME,
-                            ConstantsKt.PERMISSION_DEVICE_PRECISE_LOCATION
+        .add(rb.getString("permission_placeholder"))
+        .add(
+            new Permission()
+                .setPermissions(
+                    new String[]{
+                        ConstantsKt.PERMISSION_NAME, ConstantsKt.PERMISSION_DEVICE_PRECISE_LOCATION
                     })
-                    .setContext("To provide a better experience"));
+                .setContext(rb.getString("permission_context")));
 
     return responseBuilder.build();
   }
@@ -145,28 +159,31 @@ public class HelperIntentsApp extends DialogflowApp {
   @ForIntent("actions_intent_permission")
   public ActionResponse handlePermissionResponse(ActionRequest request) {
     ResponseBuilder responseBuilder = getResponseBuilder(request);
-    boolean havePermission = request.isPermissionGranted() != null &&
-            request.isPermissionGranted().booleanValue();
+    ResourceBundle rb = ResourceBundle.getBundle("resources", request.getLocale());
+
+    boolean havePermission =
+        request.isPermissionGranted() != null && request.isPermissionGranted();
     String response;
     if (havePermission) {
       UserProfile userProfile = request.getUser().getProfile();
       if (userProfile != null) {
-        response = "Thank you, " + userProfile.getDisplayName() + ".";
+        response =
+            MessageFormat.format(
+                rb.getString("permission_response_success_1"), userProfile.getDisplayName());
       } else {
-        response = "Thank you.";
+        response = rb.getString("permission_response_success_2");
       }
       Location location = request.getDevice().getLocation();
       if (location != null) {
-        response += " We can find something near your location - " +
-                getLocationString(location);
+        response +=
+            MessageFormat.format(
+                rb.getString("permission_response_location_1"), getLocationString(location));
       }
     } else {
-      response = "That's ok. We will still make it work.";
+      response = rb.getString("permission_response_location_2");
     }
 
-    responseBuilder
-            .add(response)
-            .addSuggestions(SUGGESTIONS);
+    responseBuilder.add(response).addSuggestions(SUGGESTIONS);
 
     return responseBuilder.build();
   }
@@ -178,8 +195,9 @@ public class HelperIntentsApp extends DialogflowApp {
     } else if (location.getCity() != null) {
       return location.getCity();
     } else if (location.getCoordinates() != null) {
-      return location.getCoordinates().getLatitude() + " / " +
-              location.getCoordinates().getLongitude();
+      return location.getCoordinates().getLatitude()
+          + " / "
+          + location.getCoordinates().getLongitude();
     }
     return "";
   }
@@ -187,11 +205,14 @@ public class HelperIntentsApp extends DialogflowApp {
   @ForIntent("askForPlace")
   public ActionResponse askForPlace(ActionRequest request) {
     ResponseBuilder responseBuilder = getResponseBuilder(request);
+    ResourceBundle rb = ResourceBundle.getBundle("resources", request.getLocale());
+
     responseBuilder
-            .add("Placeholder for place text")
-            .add(new Place()
-                    .setRequestPrompt("Where do you want to have lunch?")
-                    .setPermissionContext("To find lunch locations"));
+        .add(rb.getString("place_placeholder"))
+        .add(
+            new Place()
+                .setRequestPrompt(rb.getString("place_prompt"))
+                .setPermissionContext(rb.getString("place_context")));
 
     return responseBuilder.build();
   }
@@ -199,18 +220,19 @@ public class HelperIntentsApp extends DialogflowApp {
   @ForIntent("actions_intent_place")
   public ActionResponse handlePlaceResponse(ActionRequest request) {
     ResponseBuilder responseBuilder = getResponseBuilder(request);
+    ResourceBundle rb = ResourceBundle.getBundle("resources", request.getLocale());
+
     Location location = request.getPlace();
 
     String response;
     if (location != null) {
-      response = " Suggested place - " + getLocationString(location);
+      response = MessageFormat
+          .format(rb.getString("place_response_success"), getLocationString(location));
     } else {
-      response = "Sorry, I need your location to suggest lunch places";
+      response = rb.getString("place_response_failure");
     }
 
-    responseBuilder
-            .add(response)
-            .addSuggestions(SUGGESTIONS);
+    responseBuilder.add(response).addSuggestions(SUGGESTIONS);
 
     return responseBuilder.build();
   }
@@ -218,14 +240,13 @@ public class HelperIntentsApp extends DialogflowApp {
   @ForIntent("askForSignIn")
   public ActionResponse askForSignIn(ActionRequest request) {
     ResponseBuilder responseBuilder = getResponseBuilder(request);
+    ResourceBundle rb = ResourceBundle.getBundle("resources", request.getLocale());
+
 
     if (!request.hasCapability(Capability.SCREEN_OUTPUT.getValue())) {
-      responseBuilder.add("Sign in is only available on devices " +
-              "with a screen");
+      responseBuilder.add(rb.getString("signin_placeholder_error"));
     } else {
-      responseBuilder
-              .add("Placeholder for sign in text")
-              .add(new SignIn());
+      responseBuilder.add(rb.getString("signin_placeholder")).add(new SignIn());
     }
 
     return responseBuilder.build();
@@ -234,12 +255,14 @@ public class HelperIntentsApp extends DialogflowApp {
   @ForIntent("actions_intent_sign_in")
   public ActionResponse handleSignInResponse(ActionRequest request) {
     ResponseBuilder responseBuilder = getResponseBuilder(request);
-    boolean signedIn = request.isSignedIn() != null &&
-            request.isSignedIn().booleanValue();
+    ResourceBundle rb = ResourceBundle.getBundle("resources", request.getLocale());
+
+    boolean signedIn = request.isSignedIn() != null && request.isSignedIn();
 
     responseBuilder
-            .add(signedIn ? "Successfully signed in" : "Unable to sign in")
-            .addSuggestions(SUGGESTIONS);
+        .add(signedIn ? rb.getString("signin_response_success")
+            : rb.getString("signin_response_failure"))
+        .addSuggestions(SUGGESTIONS);
 
     return responseBuilder.build();
   }

@@ -1,7 +1,6 @@
-# Actions on Google: Helper intents sample
+# Actions on Google: Helper intent sample using Java
 
-Actions on Google sample that demonstrates how to use the library to invoke helper intents such as requesting
-the user for their name or location.
+This sample demonstrates the use of helper intents on Actions on Google using Java.
 
 ## Setup Instructions
 
