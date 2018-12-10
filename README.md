@@ -29,14 +29,6 @@ Copy the name of this project from the Action Console project settings page.
     1. Deploy to [App Engine using Gradle](https://cloud.google.com/appengine/docs/flexible/java/using-gradle) by running the following command: `gradle appengineDeploy`. You can do this directly from
     IntelliJ by opening the Gradle tray and running the appEngineDeploy task. This will start the process to deploy the fulfillment code to Google Cloud App Engine.
 
-#### Build for AWS
-    1. Delete ActionsServlet
-    1. Remove the following line from build.gradle:
-       1. `apply from: 'build-gcp.gradle'`
-    1. Build the AWS Lambda compatible zip file using the buildAWSZip gradle task: `gradle buildAWSZip`
-    1. Deploy the zip file found at `build/distributions/myactions.zip` as an AWS Lambda function by following instructions at https://aws.amazon.com/lambda/
-
-
 ## Test on the Actions on Google simulator
 1. Select [*Integrations*](https://console.dialogflow.com/api-client/#/agent//integrations) from the left navigation menu and open the *Settings* menu for Actions on Google.
 1. Enable *Auto-preview changes* and Click *Test*. This will open the Actions on Google simulator.
