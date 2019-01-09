@@ -21,9 +21,6 @@ When a new project is created using the Actions Console, it also creates a Googl
 Copy the name of this project from the Action Console project settings page.
 
 #### Build for Google Cloud Platform
-    1. Delete ActionsAWSHandler.java
-    1. Remove the following line from build.gradle:
-       1. `apply from: 'build-aws.gradle'`
     1. Instructions for [Google Cloud App Engine Standard Environment](https://cloud.google.com/appengine/docs/standard/java/)
     1. Use gcloud CLI to set the project to the name of your Actions project. Use 'gcloud init' to initialize and set your Google cloud project to the name of the Actions project.
     1. Deploy to [App Engine using Gradle](https://cloud.google.com/appengine/docs/flexible/java/using-gradle) by running the following command: `gradle appengineDeploy`. You can do this directly from
