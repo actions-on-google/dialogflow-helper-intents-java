@@ -62,8 +62,7 @@ public class HelperIntentsApp extends DialogflowApp {
   public ActionResponse handleNoInput(ActionRequest request) {
     ResponseBuilder responseBuilder = getResponseBuilder(request);
     ResourceBundle rb = ResourceBundle.getBundle("resources", request.getLocale());
-    int repromptCount =
-        request.getRepromptCount() == null ? 0 : request.getRepromptCount();
+    int repromptCount = request.getRepromptCount() == null ? 0 : request.getRepromptCount();
     if (repromptCount == 0) {
       responseBuilder.add(rb.getString("no_input_1")).build();
     } else if (repromptCount == 1) {
@@ -90,8 +89,7 @@ public class HelperIntentsApp extends DialogflowApp {
 
   @ForIntent("actions_intent_confirmation")
   public ActionResponse handleConfirmationResponse(ActionRequest request) {
-    boolean userConfirmation =
-        request.getUserConfirmation() != null && request.getUserConfirmation();
+    boolean userConfirmation = request.getUserConfirmation();
 
     ResponseBuilder responseBuilder = getResponseBuilder(request);
     ResourceBundle rb = ResourceBundle.getBundle("resources", request.getLocale());
@@ -161,8 +159,7 @@ public class HelperIntentsApp extends DialogflowApp {
     ResponseBuilder responseBuilder = getResponseBuilder(request);
     ResourceBundle rb = ResourceBundle.getBundle("resources", request.getLocale());
 
-    boolean havePermission =
-        request.isPermissionGranted() != null && request.isPermissionGranted();
+    boolean havePermission = request.isPermissionGranted();
     String response;
     if (havePermission) {
       UserProfile userProfile = request.getUser().getProfile();
@@ -226,8 +223,8 @@ public class HelperIntentsApp extends DialogflowApp {
 
     String response;
     if (location != null) {
-      response = MessageFormat
-          .format(rb.getString("place_response_success"), getLocationString(location));
+      response =
+          MessageFormat.format(rb.getString("place_response_success"), getLocationString(location));
     } else {
       response = rb.getString("place_response_failure");
     }
@@ -241,7 +238,6 @@ public class HelperIntentsApp extends DialogflowApp {
   public ActionResponse askForSignIn(ActionRequest request) {
     ResponseBuilder responseBuilder = getResponseBuilder(request);
     ResourceBundle rb = ResourceBundle.getBundle("resources", request.getLocale());
-
 
     if (!request.hasCapability(Capability.SCREEN_OUTPUT.getValue())) {
       responseBuilder.add(rb.getString("signin_placeholder_error"));
@@ -257,11 +253,13 @@ public class HelperIntentsApp extends DialogflowApp {
     ResponseBuilder responseBuilder = getResponseBuilder(request);
     ResourceBundle rb = ResourceBundle.getBundle("resources", request.getLocale());
 
-    boolean signedIn = request.isSignedIn() != null && request.isSignedIn();
+    boolean signedIn = request.isSignInGranted();
 
     responseBuilder
-        .add(signedIn ? rb.getString("signin_response_success")
-            : rb.getString("signin_response_failure"))
+        .add(
+            signedIn
+                ? rb.getString("signin_response_success")
+                : rb.getString("signin_response_failure"))
         .addSuggestions(SUGGESTIONS);
 
     return responseBuilder.build();
