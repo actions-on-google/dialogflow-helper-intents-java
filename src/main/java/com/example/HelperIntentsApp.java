@@ -238,12 +238,7 @@ public class HelperIntentsApp extends DialogflowApp {
   public ActionResponse askForSignIn(ActionRequest request) {
     ResponseBuilder responseBuilder = getResponseBuilder(request);
     ResourceBundle rb = ResourceBundle.getBundle("resources", request.getLocale());
-
-    if (!request.hasCapability(Capability.SCREEN_OUTPUT.getValue())) {
-      responseBuilder.add(rb.getString("signin_placeholder_error"));
-    } else {
-      responseBuilder.add(rb.getString("signin_placeholder")).add(new SignIn());
-    }
+    responseBuilder.add(rb.getString("signin_placeholder")).add(new SignIn());
 
     return responseBuilder.build();
   }
