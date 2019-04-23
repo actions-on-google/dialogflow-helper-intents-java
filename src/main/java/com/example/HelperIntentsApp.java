@@ -38,7 +38,7 @@ import java.util.ResourceBundle;
 public class HelperIntentsApp extends DialogflowApp {
 
   private static final String[] SUGGESTIONS =
-      new String[]{"confirmation", "date time", "permissions", "place", "sign in"};
+      new String[]{"Confirmation", "DateTime", "Permissions", "Place", "Sign In"};
 
   @ForIntent("Default Welcome Intent")
   public ActionResponse welcome(ActionRequest request) {
@@ -49,7 +49,7 @@ public class HelperIntentsApp extends DialogflowApp {
         .add(
             new SimpleResponse()
                 .setDisplayText(rb.getString("welcome_1"))
-                .setTextToSpeech(rb.getString("welcome_2")))
+                .setTextToSpeech(rb.getString("welcome_1")))
         .add(
             new SimpleResponse()
                 .setTextToSpeech(rb.getString("options_tts"))
@@ -108,13 +108,13 @@ public class HelperIntentsApp extends DialogflowApp {
     ResponseBuilder responseBuilder = getResponseBuilder(request);
     ResourceBundle rb = ResourceBundle.getBundle("resources", request.getLocale());
 
-    responseBuilder
-        .add(rb.getString("datetime_placeholder"))
-        .add(
-            new DateTimePrompt()
-                .setDateTimePrompt(rb.getString("datetime_prompt_1"))
-                .setDatePrompt(rb.getString("datetime_prompt_2"))
-                .setTimePrompt(rb.getString("datetime_prompt_3")));
+    ResponseBuilder add = responseBuilder
+            .add(rb.getString("datetime_placeholder"))
+            .add(
+                    new DateTimePrompt()
+                            .setDateTimePrompt(rb.getString("datetime_prompt_init"))
+                            .setDatePrompt("datetime_date_prompt")
+                            .setTimePrompt(rb.getString("datetime_time_prompt")));
     return responseBuilder.build();
   }
 
@@ -127,8 +127,15 @@ public class HelperIntentsApp extends DialogflowApp {
     DateTime dateTimeValue = request.getDateTime();
 
     if (dateTimeValue != null) {
-      response =
-          MessageFormat.format(rb.getString("datetime_response_success"), dateTimeValue.getDate());
+      Integer minutes = dateTimeValue.getTime().getMinutes();
+      String minutesStr = (minutes != null) ? String.valueOf(minutes) : "00";
+        response =
+            MessageFormat.format(
+                rb.getString("datetime_response_success"),
+                dateTimeValue.getDate().getDay(),
+                dateTimeValue.getDate().getMonth(),
+                dateTimeValue.getTime().getHours(),
+                minutesStr);
     } else {
       response = rb.getString("datetime_response_failure");
     }
@@ -218,7 +225,6 @@ public class HelperIntentsApp extends DialogflowApp {
   public ActionResponse handlePlaceResponse(ActionRequest request) {
     ResponseBuilder responseBuilder = getResponseBuilder(request);
     ResourceBundle rb = ResourceBundle.getBundle("resources", request.getLocale());
-
     Location location = request.getPlace();
 
     String response;
