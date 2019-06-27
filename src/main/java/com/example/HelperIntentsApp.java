@@ -148,14 +148,19 @@ public class HelperIntentsApp extends DialogflowApp {
     ResponseBuilder responseBuilder = getResponseBuilder(request);
     ResourceBundle rb = ResourceBundle.getBundle("resources", request.getLocale());
 
+    String[] permissions = new String[]{ConstantsKt.PERMISSION_NAME};
+    if (request.getUser().getUserVerificationStatus().equals("VERIFIED")) {
+      // Location permissions only work for verified users
+      // https://developers.google.com/actions/assistant/guest-users
+      permissions = new String[]{
+        ConstantsKt.PERMISSION_NAME, ConstantsKt.PERMISSION_DEVICE_PRECISE_LOCATION
+      };
+    }
     responseBuilder
         .add(rb.getString("permission_placeholder"))
         .add(
             new Permission()
-                .setPermissions(
-                    new String[]{
-                        ConstantsKt.PERMISSION_NAME, ConstantsKt.PERMISSION_DEVICE_PRECISE_LOCATION
-                    })
+                .setPermissions(permissions)
                 .setContext(rb.getString("permission_context")));
 
     return responseBuilder.build();
@@ -244,7 +249,13 @@ public class HelperIntentsApp extends DialogflowApp {
   public ActionResponse askForSignIn(ActionRequest request) {
     ResponseBuilder responseBuilder = getResponseBuilder(request);
     ResourceBundle rb = ResourceBundle.getBundle("resources", request.getLocale());
-    responseBuilder.add(rb.getString("signin_placeholder")).add(new SignIn());
+    if (!request.getUser().getUserVerificationStatus().equals("VERIFIED")) {
+      // Account linking only works for verified users
+      // https://developers.google.com/actions/assistant/guest-users
+      responseBuilder.add(rb.getString("signin_placeholder_guest_error"));
+    } else {
+      responseBuilder.add(rb.getString("signin_placeholder")).add(new SignIn());
+    }
 
     return responseBuilder.build();
   }
